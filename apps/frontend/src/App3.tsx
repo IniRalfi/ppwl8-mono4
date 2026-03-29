@@ -7,6 +7,8 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
+const BACKEND_URL = import.meta.env.VITE_BACKEND_URL ?? "http://localhost:3000";
+
 // ─────────────────────────────────────────────
 // Helpers
 // ─────────────────────────────────────────────
@@ -115,18 +117,12 @@ function CourseWorkCard({ item }: { item: CourseWorkWithSubmission }) {
 
       <Separator className="shrink-0" />
 
-      {/*
-    ScrollArea membungkus seluruh body — card tidak akan
-    tumbuh melebihi tinggi container grid-nya.
-    Hapus ScrollArea kalau kamu tidak pakai fixed-height grid.
-  */}
       <ScrollArea className="flex-1 min-h-0">
         <CardContent className="flex flex-col gap-3 pt-3 pb-4">
           {/* Deskripsi tugas */}
           {courseWork.description && (
             <div className="flex flex-col gap-1">
               <p className="text-xs font-semibold text-muted-foreground">DESKRIPSI</p>
-              {/* line-clamp-4: potong deskripsi panjang, tidak mendorong elemen lain */}
               <p className="text-sm text-foreground whitespace-pre-wrap wrap-break-word line-clamp-4">
                 {courseWork.description}
               </p>
@@ -183,14 +179,13 @@ function CourseWorkCard({ item }: { item: CourseWorkWithSubmission }) {
           {submission?.shortAnswerSubmission?.answer && (
             <div className="flex flex-col gap-1">
               <p className="text-xs font-semibold text-muted-foreground">JAWABAN SINGKATMU</p>
-              {/* break-words: cegah teks panjang tanpa spasi meluber keluar card */}
               <p className="text-sm italic wrap-break-word">
                 "{submission.shortAnswerSubmission.answer}"
               </p>
             </div>
           )}
 
-          {/* Late badge — selalu paling bawah, diberi padding atas */}
+          {/* Late badge */}
           {submission?.late && (
             <div className="pt-1">
               <Badge variant="destructive" className="w-fit text-xs">
@@ -218,7 +213,7 @@ export default function App() {
 
   // Cek status login
   useEffect(() => {
-    fetch("http://localhost:3000/auth/me", { credentials: "include" })
+    fetch(`${BACKEND_URL}/auth/me`, { credentials: "include" })
       .then((r) => r.json())
       .then((d) => setLoggedIn(d.loggedIn))
       .catch(() => setLoggedIn(false));
@@ -227,7 +222,7 @@ export default function App() {
   // Load daftar courses setelah login
   useEffect(() => {
     if (!loggedIn) return;
-    fetch("http://localhost:3000/classroom/courses", { credentials: "include" })
+    fetch(`${BACKEND_URL}/classroom/courses`, { credentials: "include" })
       .then((r) => r.json())
       .then((d) => setCourses(d.data ?? []));
   }, [loggedIn]);
@@ -238,7 +233,7 @@ export default function App() {
     setLoading(true);
     setError(null);
     try {
-      const res = await fetch(`http://localhost:3000/classroom/courses/${courseId}/submissions`, {
+      const res = await fetch(`${BACKEND_URL}/classroom/courses/${courseId}/submissions`, {
         credentials: "include",
       });
       const d = await res.json();
@@ -252,11 +247,11 @@ export default function App() {
   };
 
   const handleLogin = () => {
-    window.location.href = "http://localhost:3000/auth/login";
+    window.location.href = `${BACKEND_URL}/auth/login`;
   };
 
   const handleLogout = async () => {
-    await fetch("http://localhost:3000/auth/logout", { method: "POST", credentials: "include" });
+    await fetch(`${BACKEND_URL}/auth/logout`, { method: "POST", credentials: "include" });
     setLoggedIn(false);
     setCourses([]);
     setItems([]);

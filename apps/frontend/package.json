@@ -7,7 +7,7 @@
     "dev": "bunx kill-port 5173 && vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "start": "bunx kill-port 4173 && vite preview"
   },
   "dependencies": {
     "@fontsource-variable/geist": "^5.2.8",
